@@ -97,32 +97,25 @@ class PageIDsDynamicChoices(DynamicChoice):
 
 
 class DynamicTemplateChoices(DynamicChoice):
-    path = None
-    exclude = None
-    inlude = None
 
     def __init__(self, path=None, include=None,
                        exclude=None, *args, **kwargs):
+
         super(DynamicTemplateChoices, self).__init__(self, *args, **kwargs)
         self.path = path
         self.include = include
         self.exlude = exclude
 
     def generate(self,*args, **kwargs):
-        choices = list()
-
+        choices = set()
         for template_dir in app_template_dirs:
-          results = self.walkdir(os.path.join(template_dir, self.path))
-          if results:
-              choices += results
-
+          choices |= set(self.walkdir(os.path.join(template_dir, self.path)))
         return choices
 
     def walkdir(self, path=None):
-        output = list()
 
         if not os.path.exists(path):
-            return None
+            return
 
         for root, dirs, files in os.walk(path):
 
@@ -133,12 +126,8 @@ class DynamicTemplateChoices(DynamicChoice):
                 files = filter(lambda x: not self.exlude in x, files)
 
             for item in files :
-                output += ( (
-                    os.path.join(self.path, item),
+                fragment = os.path.relpath(os.path.join(root, item), path)
+                yield (
+                    os.path.join(self.path, fragment),
                     deslugify(os.path.splitext(item)[0]),
-                ),)
-
-            for item in dirs :
-                output += self.walkdir(os.path.join(root, item))
-
-        return output
+                )
