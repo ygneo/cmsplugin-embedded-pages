@@ -3,6 +3,7 @@ import logging
 from django.db.utils import DatabaseError
 from django.template.loader import get_template
 from django.template.loaders.app_directories import app_template_dirs
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 
@@ -108,7 +109,7 @@ class DynamicTemplateChoices(DynamicChoice):
 
     def generate(self,*args, **kwargs):
         choices = set()
-        for template_dir in app_template_dirs:
+        for template_dir in app_template_dirs + settings.TEMPLATE_DIRS:
           choices |= set(self.walkdir(os.path.join(template_dir, self.path)))
         return choices
 
