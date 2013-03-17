@@ -55,8 +55,7 @@ class PagePlugin(CMSPluginBase):
 
             try :
                 pages = Page.objects.filter(parent=instance.root,
-                                             published=True,
-                                             in_navigation=True)
+                                             published=True)
 
 #                if instance.filter_actions and instance.filter_attributes:
 #                    pages = getattr(pages, instance.filter_actions)(reverse_id = instance.filter_attributes)
